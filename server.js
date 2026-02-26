@@ -1,18 +1,20 @@
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
-app.use(express.static('public'));
-
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Cached serverless-safe connection ────────────────────────────────────────
+let client = null;
 let db = null;
 async function connectDB() {
     if (db) return db;                          // reuse cached connection
+    const uri = process.env.MONGO_URI;
+    if (!uri) throw new Error('MONGO_URI environment variable is not set');
+    client = new MongoClient(uri);
     await client.connect();
     db = client.db('zenith_cms');
     console.log('✅ Connected to MongoDB Atlas (zenith_cms)');
