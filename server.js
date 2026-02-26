@@ -9,22 +9,20 @@ app.use(express.static('public'));
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri);
 
-let db;
+// ── Cached serverless-safe connection ────────────────────────────────────────
+let db = null;
 async function connectDB() {
-    try {
-        await client.connect();
-        db = client.db('zenith_cms');
-        console.log('✅ Connected to MongoDB Atlas (zenith_cms)');
-    } catch (err) {
-        console.error('❌ MongoDB connection error:', err.message);
-        process.exit(1);
-    }
+    if (db) return db;                          // reuse cached connection
+    await client.connect();
+    db = client.db('zenith_cms');
+    console.log('✅ Connected to MongoDB Atlas (zenith_cms)');
+    return db;
 }
-connectDB();
 
 // ── GET all posts (newest first) ─────────────────────────────────────────────
 app.get('/api/posts', async (req, res) => {
     try {
+        const db = await connectDB();
         const posts = await db.collection('blogs')
             .find()
             .sort({ date: -1 })
@@ -38,6 +36,7 @@ app.get('/api/posts', async (req, res) => {
 // ── GET single post by id ─────────────────────────────────────────────────────
 app.get('/api/posts/:id', async (req, res) => {
     try {
+        const db = await connectDB();
         const post = await db.collection('blogs').findOne({ _id: new ObjectId(req.params.id) });
         if (!post) return res.status(404).json({ error: 'Post not found' });
         res.json(post);
@@ -49,6 +48,7 @@ app.get('/api/posts/:id', async (req, res) => {
 // ── POST create a new post ────────────────────────────────────────────────────
 app.post('/api/posts', async (req, res) => {
     try {
+        const db = await connectDB();
         const { title, category, content, author } = req.body;
         if (!title || !content) {
             return res.status(400).json({ error: 'Title and content are required.' });
@@ -71,6 +71,7 @@ app.post('/api/posts', async (req, res) => {
 // ── PATCH update an existing post ────────────────────────────────────────────
 app.patch('/api/posts/:id', async (req, res) => {
     try {
+        const db = await connectDB();
         const { title, category, content, author } = req.body;
         const updates = {};
         if (title)    updates.title    = title.trim();
@@ -93,6 +94,7 @@ app.patch('/api/posts/:id', async (req, res) => {
 // ── DELETE a post ─────────────────────────────────────────────────────────────
 app.delete('/api/posts/:id', async (req, res) => {
     try {
+        const db = await connectDB();
         const result = await db.collection('blogs').deleteOne({ _id: new ObjectId(req.params.id) });
         if (result.deletedCount === 0) return res.status(404).json({ error: 'Post not found' });
         res.json({ message: 'Post deleted!' });
@@ -101,5 +103,10 @@ app.delete('/api/posts/:id', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// ── Local dev server (ignored by Vercel) ─────────────────────────────────────
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+}
+
+module.exports = app;
