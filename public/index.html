@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Zenith — Blog CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ────────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-icon">✦</span>
+        <span class="brand-name">Project Zenith</span>
+      </div>
+      <nav class="header-actions">
+        <button class="btn btn-ghost" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+          <span class="theme-icon">☀</span>
+        </button>
+        <button class="btn btn-primary" id="newPostBtn">
+          <span>＋</span> New Post
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── HERO ──────────────────────────────────────────────────── -->
+  <section class="hero">
+    <p class="hero-sub">Ideas, stories & insights — all in one place.</p>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search posts…" autocomplete="off" />
+      <span class="search-icon">⌕</span>
+    </div>
+  </section>
+
+  <!-- ── CATEGORY FILTER ───────────────────────────────────────── -->
+  <section class="filters" id="filterBar">
+    <button class="pill active" data-cat="All">All</button>
+    <button class="pill" data-cat="Technology">Technology</button>
+    <button class="pill" data-cat="Design">Design</button>
+    <button class="pill" data-cat="Science">Science</button>
+    <button class="pill" data-cat="Culture">Culture</button>
+    <button class="pill" data-cat="General">General</button>
+  </section>
+
+  <!-- ── MAIN GRID ─────────────────────────────────────────────── -->
+  <main class="main-content">
+    <div id="statusBar" class="status-bar"></div>
+    <div id="blogGrid" class="blog-grid">
+      <!-- Cards injected by JS -->
+    </div>
+    <div id="emptyState" class="empty-state hidden">
+      <span class="empty-icon">📝</span>
+      <p>No posts yet. Be the first to write something!</p>
+    </div>
+  </main>
+
+  <!-- ── SINGLE POST OVERLAY ───────────────────────────────────── -->
+  <div id="postOverlay" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="overlay-panel post-panel">
+      <button class="close-btn" id="closePost" aria-label="Close">✕</button>
+      <div id="postContent" class="post-content"></div>
+    </div>
+  </div>
+
+  <!-- ── EDITOR MODAL ──────────────────────────────────────────── -->
+  <div id="editorOverlay" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="overlay-panel editor-panel">
+      <button class="close-btn" id="closeEditor" aria-label="Close">✕</button>
+      <h2 id="editorTitle" class="editor-heading">New Post</h2>
+      <form id="postForm" novalidate>
+        <input type="hidden" id="editId" />
+        <div class="form-group">
+          <label for="fTitle">Title <span class="req">*</span></label>
+          <input type="text" id="fTitle" placeholder="An eye-catching headline…" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fCategory">Category</label>
+            <select id="fCategory">
+              <option value="General">General</option>
+              <option value="Technology">Technology</option>
+              <option value="Design">Design</option>
+              <option value="Science">Science</option>
+              <option value="Culture">Culture</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fAuthor">Author</label>
+            <input type="text" id="fAuthor" placeholder="Your name…" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="fContent">Content <span class="req">*</span></label>
+          <textarea id="fContent" rows="10" placeholder="Write your story…" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="cancelEditor">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── DELETE CONFIRM MODAL ──────────────────────────────────── -->
+  <div id="confirmOverlay" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="overlay-panel confirm-panel">
+      <h3>Delete this post?</h3>
+      <p>This action cannot be undone.</p>
+      <div class="form-actions">
+        <button class="btn btn-ghost" id="cancelDelete">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ─────────────────────────────────────────────────── -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
